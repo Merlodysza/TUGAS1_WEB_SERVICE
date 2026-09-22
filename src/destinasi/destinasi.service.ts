@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class DestinasiService {
@@ -17,14 +17,27 @@ export class DestinasiService {
         },
     ];
 
+    // GET /destinasi
     findAll() {
         return this.destinasi;
     }
 
+    // GET /destinasi/:id
     findOne(id: number) {
-        return this.destinasi.find((item) => item.id === id);
+        const destinasi = this.destinasi.find(
+            (item) => item.id === id,
+        );
+
+        if (!destinasi) {
+            throw new NotFoundException(
+                'Destinasi tidak ditemukan',
+            );
+        }
+
+        return destinasi;
     }
 
+    // POST /destinasi
     create(data: any) {
         const newDestinasi = {
             id: this.destinasi.length + 1,
@@ -34,5 +47,47 @@ export class DestinasiService {
         this.destinasi.push(newDestinasi);
 
         return newDestinasi;
+    }
+
+    // PATCH /destinasi/:id
+    update(id: number, data: any) {
+        const index = this.destinasi.findIndex(
+            (item) => item.id === id,
+        );
+
+        if (index === -1) {
+            throw new NotFoundException(
+                'Destinasi tidak ditemukan',
+            );
+        }
+
+        this.destinasi[index] = {
+            ...this.destinasi[index],
+            ...data,
+        };
+
+        return this.destinasi[index];
+    }
+
+    // DELETE /destinasi/:id
+    remove(id: number) {
+        const index = this.destinasi.findIndex(
+            (item) => item.id === id,
+        );
+
+        if (index === -1) {
+            throw new NotFoundException(
+                'Destinasi tidak ditemukan',
+            );
+        }
+
+        const deletedDestinasi = this.destinasi[index];
+
+        this.destinasi.splice(index, 1);
+
+        return {
+            message: 'Destinasi berhasil dihapus',
+            data: deletedDestinasi,
+        };
     }
 }
