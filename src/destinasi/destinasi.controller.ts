@@ -6,6 +6,9 @@ import {
     Param,
     Patch,
     Post,
+    Query,
+    ParseIntPipe,
+    HttpCode,
 } from '@nestjs/common';
 
 import {
@@ -34,8 +37,8 @@ export class DestinasiController {
         status: 200,
         description: 'Daftar destinasi berhasil diambil',
     })
-    findAll() {
-        return this.destinasiService.findAll();
+    findAll(@Query('kategori') kategori?: string) {
+        return this.destinasiService.findAll(kategori);
     }
 
     // GET /destinasi/:id
@@ -51,8 +54,8 @@ export class DestinasiController {
         status: 404,
         description: 'Destinasi tidak ditemukan',
     })
-    findOne(@Param('id') id: string) {
-        return this.destinasiService.findOne(Number(id));
+    findOne(@Param('id', ParseIntPipe) id: number) {
+        return this.destinasiService.findOne(id);
     }
 
     // POST /destinasi
@@ -86,14 +89,15 @@ export class DestinasiController {
         description: 'Destinasi tidak ditemukan',
     })
     update(
-        @Param('id') id: string,
+        @Param('id', ParseIntPipe) id: number,
         @Body() dto: UpdateDestinasiDto,
     ) {
-        return this.destinasiService.update(Number(id), dto);
+        return this.destinasiService.update(id, dto);
     }
 
     // DELETE /destinasi/:id
     @Delete(':id')
+    @HttpCode(200)
     @ApiOperation({
         summary: 'Menghapus destinasi berdasarkan ID',
     })
@@ -105,7 +109,7 @@ export class DestinasiController {
         status: 404,
         description: 'Destinasi tidak ditemukan',
     })
-    remove(@Param('id') id: string) {
-        return this.destinasiService.remove(Number(id));
+    remove(@Param('id', ParseIntPipe) id: number) {
+        return this.destinasiService.remove(id);
     }
 }

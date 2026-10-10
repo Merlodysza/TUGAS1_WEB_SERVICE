@@ -1,93 +1,57 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateDestinasiDto } from './dto/create-destinasi.dto';
+import { UpdateDestinasiDto } from './dto/update-destinasi.dto';
 
 @Injectable()
 export class DestinasiService {
-    private destinasi = [
-        {
-            id: 1,
-            nama: 'Pantai Kuta Mandalika',
-            kategori: 'Pantai',
-            hargaTiket: 15000,
-        },
-        {
-            id: 2,
-            nama: 'Bukit Merese',
-            kategori: 'Bukit',
-            hargaTiket: 10000,
-        },
-    ];
+    constructor(private prisma: PrismaService) { }
 
-    // GET /destinasi
-    findAll() {
-        return this.destinasi;
+    async findAll(kategori?: string) {
+        return this.prisma.destinasi.findMany({
+            where: kategori ? { kategori } : undefined,
+            orderBy: { createdAt: 'desc' },
+        });
     }
 
-    // GET /destinasi/:id
-    findOne(id: number) {
-        const destinasi = this.destinasi.find(
-            (item) => item.id === id,
-        );
+    async findOne(id: number) {
+        const destinasi = await this.prisma.destinasi.findUnique({
+            where: { id },
+        });
 
         if (!destinasi) {
             throw new NotFoundException(
-                'Destinasi tidak ditemukan',
+                `Destinasi dengan id ${id} tidak ditemukan`,
             );
         }
 
         return destinasi;
     }
 
-    // POST /destinasi
-    create(data: any) {
-        const newDestinasi = {
-            id: this.destinasi.length + 1,
-            ...data,
-        };
-
-        this.destinasi.push(newDestinasi);
-
-        return newDestinasi;
+    async create(dto: CreateDestinasiDto) {
+        return this.prisma.destinasi.create({
+            data: dto,
+        });
     }
 
-    // PATCH /destinasi/:id
-    update(id: number, data: any) {
-        const index = this.destinasi.findIndex(
-            (item) => item.id === id,
-        );
+    async update(id: number, dto: UpdateDestinasiDto) {
+        await this.findOne(id);
 
-        if (index === -1) {
-            throw new NotFoundException(
-                'Destinasi tidak ditemukan',
-            );
-        }
-
-        this.destinasi[index] = {
-            ...this.destinasi[index],
-            ...data,
-        };
-
-        return this.destinasi[index];
+        return this.prisma.destinasi.update({
+            where: { id },
+            data: dto,
+        });
     }
 
-    // DELETE /destinasi/:id
-    remove(id: number) {
-        const index = this.destinasi.findIndex(
-            (item) => item.id === id,
-        );
+    async remove(id: number) {
+        await this.findOne(id);
 
-        if (index === -1) {
-            throw new NotFoundException(
-                'Destinasi tidak ditemukan',
-            );
-        }
-
-        const deletedDestinasi = this.destinasi[index];
-
-        this.destinasi.splice(index, 1);
+        await this.prisma.destinasi.delete({
+            where: { id },
+        });
 
         return {
             message: 'Destinasi berhasil dihapus',
-            data: deletedDestinasi,
         };
     }
 }

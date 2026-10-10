@@ -18,7 +18,16 @@
     "/destinasi": {
       "get": {
         "operationId": "DestinasiController_findAll",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "kategori",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Daftar destinasi berhasil diambil"
@@ -65,7 +74,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "number"
             }
           }
         ],
@@ -90,7 +99,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "number"
             }
           }
         ],
@@ -125,7 +134,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "number"
             }
           }
         ],
