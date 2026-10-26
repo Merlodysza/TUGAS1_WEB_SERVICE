@@ -8,29 +8,33 @@ datasource db {
 }
 
 model Destinasi {
-  id          Int      @id @default(autoincrement())
-  nama        String
-  kategori    String
-  lokasi      String?
-  hargaTiket  Float
-  ratingRata  Float    @default(0)
-  ulasan      Ulasan[]
-  fasilitas   Fasilitas[]
-  createdAt   DateTime @default(now())
+  id         Int         @id @default(autoincrement())
+  nama       String
+  kategori   String
+  lokasi     String?
+  hargaTiket Float
+  ratingRata Float       @default(0)
+  createdAt  DateTime    @default(now())
+  fasilitas  Fasilitas[]
+  ulasan     Ulasan[]
 }
 
 model Ulasan {
   id          Int       @id @default(autoincrement())
-  destinasi   Destinasi @relation(fields: [destinasiId], references: [id])
   destinasiId Int
   rating      Int
   komentar    String
   createdAt   DateTime  @default(now())
+  destinasi   Destinasi @relation(fields: [destinasiId], references: [id])
+
+  @@index([destinasiId], map: "Ulasan_destinasiId_fkey")
 }
 
 model Fasilitas {
-  id           Int       @id @default(autoincrement())
-  destinasi    Destinasi @relation(fields: [destinasiId], references: [id])
-  destinasiId  Int
+  id            Int       @id @default(autoincrement())
+  destinasiId   Int
   namaFasilitas String
+  destinasi     Destinasi @relation(fields: [destinasiId], references: [id])
+
+  @@index([destinasiId], map: "Fasilitas_destinasiId_fkey")
 }
